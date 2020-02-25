@@ -1,12 +1,15 @@
+# code is modified from opencv python example
+# https://github.com/tobybreckon/python-examples-cv/blob/master/kalman_tracking_live.py
+
 import cv2
 import math
 import numpy as np
 
 class kalmanFilter:
-    def __init__(self, numOf2DPoints = 1):
+    def __init__(self):
 
-        self.measureNum = 2 * numOf2DPoints # we can only measure x, y from the sensor
-        self.stateNum = 2 * self.measureNum # constraints the state and velocity model[x,y,dx.dy]
+        self.measureNum = 2 # we can only measure x, y from the sensor
+        self.stateNum = 2 * self.measureNum # constraints the state and velocity model[x,y,dx,dy]
         self.kalman = cv2.KalmanFilter(self.stateNum,self.measureNum,0) # creating the kalman filter
 
         transitionMatrix = np.zeros((self.stateNum,self.stateNum),dtype= np.float32) # denoted as F ,to extrapolate the next state from the current state
@@ -26,10 +29,9 @@ class kalmanFilter:
         # print('measurement Matrix',measurementMatrix )
 
 
-    def setFilterParams(self):
-        self.kalman.processNoiseCov = np.eye(self.stateNum,dtype= np.float32) * 0.03  # process uncertainty
-        self.kalman.measurementNoiseCov = np.eye(self.measureNum,dtype= np.float32) * 0.03 # measurement noise uncertainity
-        # self.kalman.errorCovPost = np.repeat(1,(self.stateNum,self.stateNum))
+    def setFilterParams(self, process_uncertainty = 0.03, noise_uncertainity = 0.03):
+        self.kalman.processNoiseCov = np.eye(self.stateNum,dtype= np.float32) * process_uncertainty  # process uncertainty
+        self.kalman.measurementNoiseCov = np.eye(self.measureNum,dtype= np.float32) * noise_uncertainity # measurement noise uncertainity
 
     def predictKeyPoints(self, input_points):
         # get new kalman filter predictionS
@@ -39,7 +41,9 @@ class kalmanFilter:
 
         return prediction_keypoints
 
-def displayResults(x,y,noise,prediction=None):
+def plotSinFunction(x,y,noise,prediction=None):
+    # function adapted from the stackoverflow comment
+    # https://stackoverflow.com/questions/22566692/python-how-to-plot-graph-sine-wave/34442729
     import matplotlib.pyplot as plt
     plt.plot(x, y)
     plt.plot(x, y+noise)
@@ -49,7 +53,9 @@ def displayResults(x,y,noise,prediction=None):
     plt.ylabel('voltage(V)')
     plt.show()
 
-def SampleSinfunction():
+def SampleSinFunction():
+    # function adapted from the stackoverflow comment
+    # https://stackoverflow.com/questions/22566692/python-how-to-plot-graph-sine-wave/34442729
     import numpy as np
     f = 1
     Fs = sample = 100
@@ -58,21 +64,23 @@ def SampleSinfunction():
     y = np.sin(2 * np.pi * f * x / Fs)
     return x, y,noise
 
+
 if (__name__ == "__main__"):
-    print('Test kalman filter')
-    x, y,noise = SampleSinfunction()
-    displayResults(x,y,noise)
+    print('Basic kalman filter')
+    x, y,noise = SampleSinFunction()
+    plotSinFunction(x,y,noise)
+    
     KF = kalmanFilter()
     KF.setFilterParams()
     KF_filtered_point = []
     
+    # for every sampled sin function, run the kalman filter
     for i in range(len(x)):
         dlib_points =  np.array([x[i],y[i]],dtype= np.float32)
         prediction_keypoints = KF.predictKeyPoints(dlib_points)
         KF_filtered_point.append(prediction_keypoints.reshape(2,))
 
-
-    displayResults(x,y,noise,np.asarray(KF_filtered_point))
+    plotSinFunction(x,y,noise,np.asarray(KF_filtered_point))
 
    
     
