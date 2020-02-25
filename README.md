@@ -10,7 +10,7 @@ Description: The respository contains a simple kalman filter code and the filter
   ![Sin With Noise](others/WithNoise.png "With Noise")
 
                   Sin Function Kalman filtered 
-  ![Sin With Noise](others/filtered.png "Filtered ")
+  ![Sin Without Noise](others/Filtered.png "Filtered ")
 
 
 # Depedency
