@@ -33,7 +33,7 @@ class kalmanFilter:
         self.kalman.processNoiseCov = np.eye(self.stateNum,dtype= np.float32) * process_uncertainty  # process uncertainty
         self.kalman.measurementNoiseCov = np.eye(self.measureNum,dtype= np.float32) * noise_uncertainity # measurement noise uncertainity
 
-    def predictKeyPoints(self, input_points):
+    def filterPoints(self, input_points):
         # get new kalman filter predictionS
         predicted_stateVector = self.kalman.predict() # it predicts the next state vector
         prediction_keypoints = np.matmul(self.kalman.measurementMatrix, predicted_stateVector)
@@ -45,7 +45,7 @@ def plotSinFunction(x,y,noise,prediction=None):
     # function adapted from the stackoverflow comment
     # https://stackoverflow.com/questions/22566692/python-how-to-plot-graph-sine-wave/34442729
     import matplotlib.pyplot as plt
-    plt.plot(x, y)
+    # plt.plot(x, y)
     plt.plot(x, y+noise)
     if prediction is not None:
         plt.plot(prediction[:,0], prediction[:,1])
@@ -69,16 +69,16 @@ if (__name__ == "__main__"):
     print('Basic kalman filter')
     x, y,noise = SampleSinFunction()
     plotSinFunction(x,y,noise)
-    
+
     KF = kalmanFilter()
     KF.setFilterParams()
     KF_filtered_point = []
     
     # for every sampled sin function, run the kalman filter
     for i in range(len(x)):
-        dlib_points =  np.array([x[i],y[i]],dtype= np.float32)
-        prediction_keypoints = KF.predictKeyPoints(dlib_points)
-        KF_filtered_point.append(prediction_keypoints.reshape(2,))
+        data_points =  np.array([x[i],y[i]],dtype= np.float32)
+        predicted_points = KF.filterPoints(data_points)
+        KF_filtered_point.append(predicted_points.reshape(2,))
 
     plotSinFunction(x,y,noise,np.asarray(KF_filtered_point))
 
