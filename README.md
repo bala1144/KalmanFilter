@@ -4,3 +4,19 @@ Few Weeks back I started learning Kalman filter for my work. Once I started, I s
 
 Description: The respository contains a simple kalman filter code and the filter is explained using a sin function sampling and noise.
 
+# What the result might look like ?
+
+                  Sin Function with Noise
+          ![Sin With Noise](others/WithNoise.png "With Noise")
+
+                  Sin Function Kalman filtered 
+          ![Sin With Noise](others/filtered.png "Filtered ")
+
+
+# Depedency
+  
+  ```
+    opencv
+    numpy
+    matplotlib
+  ```
